@@ -126,10 +126,9 @@
 
                     @if ($files->isEmpty())
                         <div class="p-12 text-center">
-                            <p class="text-slate-600 font-medium">No GNSS files indexed yet</p>
+                            <p class="text-slate-600 font-medium">No GNSS files available yet</p>
                             <p class="text-sm text-slate-400 mt-2 max-w-md mx-auto">
-                                Files are synced from the station FTP feed. An administrator can run
-                                <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded">php artisan cors:sync {{ $station->slug }}</code>
+                                Check back soon — new observation files are added regularly.
                             </p>
                         </div>
                     @else
