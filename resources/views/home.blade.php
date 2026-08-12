@@ -145,8 +145,8 @@
                         @if ($playStoreUrl)
                             <a href="{{ $playStoreUrl }}" target="_blank" rel="noopener noreferrer"
                                 class="inline-block transition hover:opacity-90 hover:scale-[1.02]">
-                                <img src="{{ asset('images/google-play-badge.png') }}"
-                                    alt="Get it on Google Play" width="180" height="53" class="h-[53px] w-auto">
+                                <img src="{{ asset('images/google-play-badge.png') }}" alt="Get it on Google Play"
+                                    width="180" height="53" class="h-[53px] w-auto">
                             </a>
                         @else
                             <img src="{{ asset('images/google-play-badge.png') }}" alt="Get it on Google Play"
@@ -161,8 +161,7 @@
                     </div>
                     <div class="relative w-full max-w-xs">
                         <div class="rounded-[2rem] border border-white/20 bg-slate-950/40 backdrop-blur-sm p-4 shadow-2xl">
-                            <div
-                                class="rounded-[1.5rem] overflow-hidden border border-white/10 bg-slate-950 aspect-[9/16]">
+                            <div class="rounded-[1.5rem] overflow-hidden border border-white/10 bg-slate-950 aspect-[9/16]">
                                 <img src="{{ asset('images/display.jpeg') }}" alt="SOGPOS Mobile app screenshot"
                                     class="w-full h-full object-cover object-top">
                             </div>
@@ -432,7 +431,7 @@
             <div class="lg:col-span-2" data-aos="fade-up">
                 <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">Where our CORS are located</h2>
                 <p class="mt-3 text-slate-500 leading-relaxed">
-                    {{ $states->count() }} stations across {{ $states->pluck('state_name')->unique()->implode(', ') }}.
+                    {{ $states->count() }} stations across the Country.
                 </p>
                 <p class="mt-3 text-sm text-slate-400">Click a marker to identify a station.</p>
             </div>
