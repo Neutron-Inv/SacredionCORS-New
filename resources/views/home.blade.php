@@ -36,7 +36,7 @@
 
             <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-200 rounded-xl overflow-hidden border border-slate-200 shadow-soft"
                 data-aos="fade-up">
-                @foreach ([[$states->count(), 'CORS stations'], ['24/7', 'Live coverage'], ['cm-level', 'Accuracy'], ['10 days', 'Free trial']] as $stat)
+                @foreach ([[$states->count(), 'CORS stations'], ['24/7', 'Live coverage'], ['cm-level', 'Accuracy'], ['NTRIP', 'RTK ready']] as $stat)
                     <div class="bg-white/90 backdrop-blur-sm px-5 py-6 text-center">
                         <div class="text-xl font-semibold text-slate-900">{{ $stat[0] }}</div>
                         <div class="text-xs text-slate-500 mt-1">{{ $stat[1] }}</div>
@@ -46,7 +46,6 @@
         </div>
     </section>
 
-    {{-- CORS --}}
     @php
         $corsTones = [
             [
@@ -110,6 +109,71 @@
         $stateCount = $stationsByState->count();
     @endphp
 
+    {{-- MOBILE APP --}}
+    <section id="mobile-app" class="py-8">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-brand-900 via-brand-700 to-brand-600 text-white"
+                data-aos="fade-up">
+                <div class="p-8 md:p-12 flex flex-col justify-center">
+                    <p class="text-sm font-medium text-brand-100">Live RTK in the field</p>
+                    <h2 class="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">SOGPOS Mobile</h2>
+                    <p class="mt-4 text-brand-50/90 leading-relaxed max-w-lg">
+                        Download the SOGPOS Mobile app on Google Play to access live RTK corrections across the Sacredion
+                        CORS network — wherever your survey takes you.
+                    </p>
+
+                    <ul class="mt-6 space-y-3 text-sm text-brand-50/95">
+                        <li class="flex items-start gap-3">
+                            <span
+                                class="mt-0.5 w-5 h-5 rounded-full bg-white/15 flex items-center justify-center shrink-0">✓</span>
+                            <span>Live RTK/NTRIP access across {{ $states->count() }} CORS stations nationwide</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span
+                                class="mt-0.5 w-5 h-5 rounded-full bg-white/15 flex items-center justify-center shrink-0">✓</span>
+                            <span>Centimetre-level positioning for cadastral and engineering surveys</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span
+                                class="mt-0.5 w-5 h-5 rounded-full bg-white/15 flex items-center justify-center shrink-0">✓</span>
+                            <span>Built for field crews — connect, fix, and work with confidence</span>
+                        </li>
+                    </ul>
+
+                    <div class="mt-8">
+                        @php($playStoreUrl = config('services.sogpos.google_play_url'))
+                        @if ($playStoreUrl)
+                            <a href="{{ $playStoreUrl }}" target="_blank" rel="noopener noreferrer"
+                                class="inline-block transition hover:opacity-90 hover:scale-[1.02]">
+                                <img src="{{ asset('images/google-play-badge.png') }}"
+                                    alt="Get it on Google Play" width="180" height="53" class="h-[53px] w-auto">
+                            </a>
+                        @else
+                            <img src="{{ asset('images/google-play-badge.png') }}" alt="Get it on Google Play"
+                                width="180" height="53" class="h-[53px] w-auto opacity-90">
+                        @endif
+                    </div>
+                </div>
+
+                <div class="relative min-h-[320px] bg-brand-900/40 flex items-center justify-center p-8 md:p-12">
+                    <div
+                        class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_55%)]">
+                    </div>
+                    <div class="relative w-full max-w-xs">
+                        <div class="rounded-[2rem] border border-white/20 bg-slate-950/40 backdrop-blur-sm p-4 shadow-2xl">
+                            <div
+                                class="rounded-[1.5rem] overflow-hidden border border-white/10 bg-slate-950 aspect-[9/16]">
+                                <img src="{{ asset('images/display.jpeg') }}" alt="SOGPOS Mobile app screenshot"
+                                    class="w-full h-full object-cover object-top">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- CORS --}}
     <section id="cors" class="py-20" x-data="{ q: '', region: 'all', open: null }">
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8" data-aos="fade-up">
@@ -239,70 +303,6 @@
                         </div>
                     </div>
                 @endforeach
-            </div>
-        </div>
-    </section>
-
-    {{-- MOBILE APP --}}
-    <section id="mobile-app" class="py-8">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="grid lg:grid-cols-2 gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-brand-900 via-brand-700 to-brand-600 text-white"
-                data-aos="fade-up">
-                <div class="p-8 md:p-12 flex flex-col justify-center">
-                    <p class="text-sm font-medium text-brand-100">Live RTK in the field</p>
-                    <h2 class="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">SOGPOS Mobile</h2>
-                    <p class="mt-4 text-brand-50/90 leading-relaxed max-w-lg">
-                        Download the SOGPOS Mobile app on Google Play to access live RTK corrections across the Sacredion
-                        CORS network — wherever your survey takes you.
-                    </p>
-
-                    <ul class="mt-6 space-y-3 text-sm text-brand-50/95">
-                        <li class="flex items-start gap-3">
-                            <span
-                                class="mt-0.5 w-5 h-5 rounded-full bg-white/15 flex items-center justify-center shrink-0">✓</span>
-                            <span>Live RTK/NTRIP access across {{ $states->count() }} CORS stations nationwide</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span
-                                class="mt-0.5 w-5 h-5 rounded-full bg-white/15 flex items-center justify-center shrink-0">✓</span>
-                            <span>Centimetre-level positioning for cadastral and engineering surveys</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span
-                                class="mt-0.5 w-5 h-5 rounded-full bg-white/15 flex items-center justify-center shrink-0">✓</span>
-                            <span>Built for field crews — connect, fix, and work with confidence</span>
-                        </li>
-                    </ul>
-
-                    <div class="mt-8">
-                        @php($playStoreUrl = config('services.sogpos.google_play_url'))
-                        @if ($playStoreUrl)
-                            <a href="{{ $playStoreUrl }}" target="_blank" rel="noopener noreferrer"
-                                class="inline-block transition hover:opacity-90 hover:scale-[1.02]">
-                                <img src="{{ asset('images/google-play-badge.png') }}"
-                                    alt="Get it on Google Play" width="180" height="53" class="h-[53px] w-auto">
-                            </a>
-                        @else
-                            <img src="{{ asset('images/google-play-badge.png') }}" alt="Get it on Google Play"
-                                width="180" height="53" class="h-[53px] w-auto opacity-90">
-                        @endif
-                    </div>
-                </div>
-
-                <div class="relative min-h-[320px] bg-brand-900/40 flex items-center justify-center p-8 md:p-12">
-                    <div
-                        class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_55%)]">
-                    </div>
-                    <div class="relative w-full max-w-xs">
-                        <div class="rounded-[2rem] border border-white/20 bg-slate-950/40 backdrop-blur-sm p-4 shadow-2xl">
-                            <div
-                                class="rounded-[1.5rem] overflow-hidden border border-white/10 bg-slate-950 aspect-[9/16]">
-                                <img src="{{ asset('images/display.jpeg') }}" alt="SOGPOS Mobile app screenshot"
-                                    class="w-full h-full object-cover object-top">
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
