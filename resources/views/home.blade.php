@@ -107,6 +107,7 @@
             ->sortKeys(SORT_NATURAL | SORT_FLAG_CASE)
             ->map(fn($group) => $group->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values());
         $stateCount = $stationsByState->count();
+        $playStoreUrl = config('services.sogpos.google_play_url');
     @endphp
 
     {{-- MOBILE APP --}}
@@ -141,7 +142,6 @@
                     </ul>
 
                     <div class="mt-8">
-                        @php($playStoreUrl = config('services.sogpos.google_play_url'))
                         @if ($playStoreUrl)
                             <a href="{{ $playStoreUrl }}" target="_blank" rel="noopener noreferrer"
                                 class="inline-block transition hover:opacity-90 hover:scale-[1.02]">
