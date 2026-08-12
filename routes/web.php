@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\CorsStationController;
+use App\Http\Controllers\DeployController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/deploy/refresh/{token}', [DeployController::class, 'refresh'])->name('deploy.refresh');
 
 Route::get('/cors/{station:slug}', [CorsStationController::class, 'show'])->name('cors.show');
 

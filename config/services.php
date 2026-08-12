@@ -50,4 +50,8 @@ return [
         'google_play_url' => env('SOGPOS_GOOGLE_PLAY_URL'),
     ],
 
+    'deploy' => [
+        'secret' => env('DEPLOY_SECRET'),
+    ],
+
 ];
