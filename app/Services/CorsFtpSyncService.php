@@ -236,24 +236,29 @@ class CorsFtpSyncService
         $this->log("Processing file: {$remotePath}");
 
         $remoteMtime = isset($entry['modify']) ? strtotime($entry['modify']) : null;
+        $remoteSize = isset($entry['size']) ? (int) $entry['size'] : null;
         $basename = pathinfo($remotePath, PATHINFO_FILENAME);
         $extension = pathinfo($remotePath, PATHINFO_EXTENSION);
         $relative = $this->buildLocalPath($station, $remotePath);
         $disk = Storage::disk('cors');
 
-        $existing = CorsFile::query()
-            ->where('cors_station_id', $station->id)
-            ->where('remote_path', $remotePath)
-            ->first();
+        $existing = $this->findExistingFile(
+            $station,
+            $relative,
+            $basename,
+            $extension,
+            $date,
+            $remotePath
+        );
 
-        if ($existing && $disk->exists($existing->path)) {
-            $localMtime = $disk->lastModified($existing->path);
-
-            if ($remoteMtime && $localMtime >= $remoteMtime && $existing->size === ($entry['size'] ?? $existing->size)) {
-                $this->log("{$relative} [EXISTS AND CURRENT]");
-
-                return false;
+        if ($existing && $this->fileIsCurrent($existing, $disk, $remoteSize, $remoteMtime)) {
+            if ($existing->remote_path !== $remotePath) {
+                $existing->update(['remote_path' => $remotePath]);
             }
+
+            $this->log("{$relative} [EXISTS AND CURRENT]");
+
+            return false;
         }
 
         $disk->makeDirectory(dirname($relative));
@@ -271,26 +276,19 @@ class CorsFtpSyncService
             $disk->put($relative, file_get_contents($tempFile));
             $size = $disk->size($relative);
 
-            CorsFile::updateOrCreate(
-                [
-                    'cors_station_id' => $station->id,
-                    'remote_path' => $remotePath,
-                ],
-                [
-                    'name' => $basename,
-                    'ext' => $extension,
-                    'size' => $size,
-                    'path' => $relative,
-                    'year' => $date->year,
-                    'month' => $date->month,
-                    'day' => $date->day,
-                    'observed_at' => $remoteMtime
-                        ? Carbon::createFromTimestamp($remoteMtime)
-                        : $date->copy()->startOfDay(),
-                ]
+            $this->persistFileRecord(
+                $existing,
+                $station,
+                $relative,
+                $remotePath,
+                $basename,
+                $extension,
+                $size,
+                $date,
+                $remoteMtime
             );
 
-            $this->log("{$relative} [DOWNLOADED]");
+            $this->log($existing ? "{$relative} [UPDATED]" : "{$relative} [DOWNLOADED]");
 
             return true;
         } catch (Throwable $e) {
@@ -307,6 +305,118 @@ class CorsFtpSyncService
                 @unlink($tempFile);
             }
         }
+    }
+
+    private function findExistingFile(
+        CorsStation $station,
+        string $relativePath,
+        string $basename,
+        string $extension,
+        Carbon $date,
+        string $remotePath
+    ): ?CorsFile {
+        $byPath = CorsFile::query()
+            ->where('cors_station_id', $station->id)
+            ->where('path', $relativePath)
+            ->first();
+
+        if ($byPath) {
+            return $byPath;
+        }
+
+        $byRemote = CorsFile::query()
+            ->where('cors_station_id', $station->id)
+            ->where('remote_path', $remotePath)
+            ->first();
+
+        if ($byRemote) {
+            return $byRemote;
+        }
+
+        $query = CorsFile::query()
+            ->where('cors_station_id', $station->id)
+            ->where('name', $basename)
+            ->where('year', $date->year)
+            ->where('month', $date->month)
+            ->where('day', $date->day);
+
+        if ($extension !== '') {
+            $query->where('ext', $extension);
+        } else {
+            $query->where(function ($query) {
+                $query->whereNull('ext')->orWhere('ext', '');
+            });
+        }
+
+        return $query->first();
+    }
+
+    private function fileIsCurrent(
+        CorsFile $existing,
+        Filesystem $disk,
+        ?int $remoteSize,
+        ?int $remoteMtime
+    ): bool {
+        if (! $disk->exists($existing->path)) {
+            return false;
+        }
+
+        $localSize = $disk->size($existing->path);
+        $localMtime = $disk->lastModified($existing->path);
+
+        if ($remoteSize !== null && $localSize !== $remoteSize) {
+            return false;
+        }
+
+        if ($remoteMtime !== null && $localMtime < $remoteMtime) {
+            return false;
+        }
+
+        return $existing->size === $localSize;
+    }
+
+    private function persistFileRecord(
+        ?CorsFile $existing,
+        CorsStation $station,
+        string $relative,
+        string $remotePath,
+        string $basename,
+        string $extension,
+        int $size,
+        Carbon $date,
+        ?int $remoteMtime
+    ): void {
+        $disk = Storage::disk('cors');
+        $attributes = [
+            'name' => $basename,
+            'ext' => $extension !== '' ? $extension : null,
+            'size' => $size,
+            'path' => $relative,
+            'remote_path' => $remotePath,
+            'year' => $date->year,
+            'month' => $date->month,
+            'day' => $date->day,
+            'observed_at' => $remoteMtime
+                ? Carbon::createFromTimestamp($remoteMtime)
+                : $date->copy()->startOfDay(),
+        ];
+
+        if ($existing && $existing->path !== $relative) {
+            $oldPath = $existing->path;
+            $existing->delete();
+
+            if ($disk->exists($oldPath)) {
+                $this->deleteStoredFile($disk, $oldPath);
+            }
+        }
+
+        CorsFile::updateOrCreate(
+            [
+                'cors_station_id' => $station->id,
+                'path' => $relative,
+            ],
+            $attributes
+        );
     }
 
     /**

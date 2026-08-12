@@ -81,15 +81,13 @@ class CorsLocalIndexService
             'day' => $observedAt->day,
         ];
 
-        $existing = CorsFile::query()
-            ->where('cors_station_id', $station->id)
-            ->where('path', $relativePath)
-            ->first();
+        $existing = $this->findExistingFile($station, $relativePath, $basename, $extension, $dateParts);
 
         $attributes = [
             'name' => $basename,
             'ext' => $extension,
             'size' => $size,
+            'path' => $relativePath,
             'year' => $dateParts['year'],
             'month' => $dateParts['month'],
             'day' => $dateParts['day'],
@@ -98,6 +96,7 @@ class CorsLocalIndexService
 
         if ($existing) {
             $changed = $existing->size !== $size
+                || $existing->path !== $relativePath
                 || $existing->observed_at?->getTimestamp() !== $observedAt->getTimestamp()
                 || $existing->name !== $basename
                 || $existing->ext !== $extension;
@@ -176,6 +175,43 @@ class CorsLocalIndexService
         }
 
         return true;
+    }
+
+    /**
+     * @param  array{year: int, month: int, day: int}  $dateParts
+     */
+    private function findExistingFile(
+        CorsStation $station,
+        string $relativePath,
+        string $basename,
+        ?string $extension,
+        array $dateParts
+    ): ?CorsFile {
+        $byPath = CorsFile::query()
+            ->where('cors_station_id', $station->id)
+            ->where('path', $relativePath)
+            ->first();
+
+        if ($byPath) {
+            return $byPath;
+        }
+
+        $query = CorsFile::query()
+            ->where('cors_station_id', $station->id)
+            ->where('name', $basename)
+            ->where('year', $dateParts['year'])
+            ->where('month', $dateParts['month'])
+            ->where('day', $dateParts['day']);
+
+        if ($extension) {
+            $query->where('ext', $extension);
+        } else {
+            $query->where(function ($query) {
+                $query->whereNull('ext')->orWhere('ext', '');
+            });
+        }
+
+        return $query->first();
     }
 
     /**
