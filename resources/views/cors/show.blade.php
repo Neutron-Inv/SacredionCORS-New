@@ -7,8 +7,8 @@
     <section class="relative pt-24 pb-10 border-b border-slate-200 overflow-hidden">
         <div class="absolute inset-0">
             <img src="{{ asset('images/hero-bg.jpg') }}" alt="" class="w-full h-full object-cover object-center">
-            <div class="absolute inset-0 bg-gradient-to-r from-[#dcebf5]/95 via-[#eaf3fa]/85 to-[#f3f8fc]/55"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-[#e9f3fa]/70 via-transparent to-[#f0f7fc]/35"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#ededff]/95 via-[#f0f0ff]/85 to-[#f7f7ff]/55"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#ededff]/70 via-transparent to-[#f5f5ff]/35"></div>
         </div>
 
         <div class="relative max-w-6xl mx-auto px-6">
@@ -83,24 +83,30 @@
                         @endauth
                     </div>
 
-                    <form method="GET" class="p-5 border-b border-slate-100 grid sm:grid-cols-3 gap-3">
+                    <form method="GET" class="p-5 border-b border-slate-100 grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
                         <input type="search" name="q" value="{{ request('q') }}" placeholder="Search filename"
-                            class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                            class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 sm:col-span-2 lg:col-span-1">
                         <select name="year" class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500">
                             <option value="">All years</option>
                             @foreach ($years as $year)
                                 <option value="{{ $year }}" @selected(request('year') == $year)>{{ $year }}</option>
                             @endforeach
                         </select>
-                        <div class="flex gap-2">
-                            <select name="month" class="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500">
-                                <option value="">All months</option>
-                                @for ($m = 1; $m <= 12; $m++)
-                                    <option value="{{ $m }}" @selected(request('month') == $m)>{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
-                                @endfor
-                            </select>
-                            <button class="px-4 py-2 rounded-lg border border-slate-200 text-sm hover:bg-slate-50">Filter</button>
-                        </div>
+                        <select name="month" class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500">
+                            <option value="">All months</option>
+                            @for ($m = 1; $m <= 12; $m++)
+                                <option value="{{ $m }}" @selected(request('month') == $m)>{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                            @endfor
+                        </select>
+                        <select name="day" class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500">
+                            <option value="">All days</option>
+                            @foreach ($days as $day)
+                                <option value="{{ $day }}" @selected(request('day') == $day)>{{ $day }}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="px-4 py-2 rounded-lg bg-brand-700 text-white text-sm font-medium hover:bg-brand-900 transition">
+                            Filter
+                        </button>
                     </form>
 
                     @guest
@@ -125,7 +131,7 @@
                                     <tr>
                                         @auth<th class="w-10 p-3"></th>@endauth
                                         <th class="text-left p-3 font-medium">Data name</th>
-                                        <th class="text-left p-3 font-medium">Date</th>
+                                        <th class="text-left p-3 font-medium">Date & time</th>
                                         <th class="text-left p-3 font-medium">Size</th>
                                         <th class="text-right p-3 font-medium">Action</th>
                                     </tr>
@@ -144,18 +150,21 @@
                                                 <div class="font-medium text-slate-900">{{ $file->download_name }}</div>
                                                 <div class="text-xs text-slate-400">{{ strtoupper($file->ext ?? 'file') }}</div>
                                             </td>
-                                            <td class="p-3 text-slate-600">
-                                                {{ $file->observed_at?->format('M j, Y') ?? '—' }}
+                                            <td class="p-3 text-slate-600 whitespace-nowrap">
+                                                {{ $file->formatted_observed_at ?? '—' }}
                                             </td>
                                             <td class="p-3 text-slate-600">{{ $file->formatted_size }}</td>
                                             <td class="p-3 text-right">
                                                 @auth
                                                     <a href="{{ route('cors.files.download', $file) }}"
-                                                        class="inline-flex px-3 py-1.5 rounded-lg text-brand-700 hover:bg-brand-50 font-medium transition">
+                                                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-700 text-white text-sm font-medium hover:bg-brand-900 transition shadow-sm">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"/>
+                                                        </svg>
                                                         Download
                                                     </a>
                                                 @else
-                                                    <a href="{{ route('login') }}" class="text-slate-400 hover:text-brand-700">Login</a>
+                                                    <a href="{{ route('login') }}" class="inline-flex px-3.5 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">Login</a>
                                                 @endauth
                                             </td>
                                         </tr>

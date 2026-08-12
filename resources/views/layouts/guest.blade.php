@@ -17,7 +17,7 @@
     <div class="min-h-screen relative overflow-hidden">
         <div class="absolute inset-0 pointer-events-none">
             <img src="{{ asset('images/hero-bg.jpg') }}" alt="" class="w-full h-full object-cover opacity-20">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(43,126,181,0.25),transparent_45%),radial-gradient(circle_at_80%_15%,rgba(30,67,86,0.2),transparent_45%)]"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(5,0,148,0.25),transparent_45%),radial-gradient(circle_at_80%_15%,rgba(3,0,98,0.2),transparent_45%)]"></div>
             <div class="absolute inset-0 bg-gradient-to-b from-slate-50/50 via-slate-50/75 to-slate-50"></div>
         </div>
 

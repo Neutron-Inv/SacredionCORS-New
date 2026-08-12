@@ -59,4 +59,13 @@ class CorsFile extends Model
     {
         return $this->ext ? "{$this->name}.{$this->ext}" : $this->name;
     }
+
+    public function getFormattedObservedAtAttribute(): ?string
+    {
+        if (! $this->observed_at) {
+            return null;
+        }
+
+        return $this->observed_at->format('M j, Y g:i A');
+    }
 }

@@ -25,16 +25,25 @@ class CorsStationController extends Controller
             ->orderByDesc('year')
             ->pluck('year');
 
+        $days = $station->files()
+            ->when($request->filled('year'), fn ($query) => $query->where('year', $request->integer('year')))
+            ->when($request->filled('month'), fn ($query) => $query->where('month', $request->integer('month')))
+            ->whereNotNull('day')
+            ->distinct()
+            ->orderByDesc('day')
+            ->pluck('day');
+
         $files = $station->files()
             ->when($request->filled('year'), fn ($query) => $query->where('year', $request->integer('year')))
             ->when($request->filled('month'), fn ($query) => $query->where('month', $request->integer('month')))
+            ->when($request->filled('day'), fn ($query) => $query->where('day', $request->integer('day')))
             ->when($request->filled('q'), fn ($query) => $query->where('name', 'like', '%'.$request->string('q').'%'))
             ->orderByDesc('observed_at')
             ->orderByDesc('id')
             ->paginate(25)
             ->withQueryString();
 
-        return view('cors.show', compact('station', 'files', 'years'));
+        return view('cors.show', compact('station', 'files', 'years', 'days'));
     }
 
     public function download(CorsFile $file): StreamedResponse

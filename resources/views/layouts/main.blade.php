@@ -28,12 +28,12 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: '#EEF5FA',
-                            100: '#D6E8F4',
-                            500: '#2B7EB5',
-                            600: '#1E6A9A',
-                            700: '#1E4356',
-                            900: '#123040'
+                            50: '#EEF0FF',
+                            100: '#D8DAFF',
+                            500: '#1A10C4',
+                            600: '#0F08B0',
+                            700: '#050094',
+                            900: '#030062'
                         }
                     },
                     fontFamily: {
@@ -115,7 +115,7 @@
             <div class="flex items-center gap-3">
                 <div class="hidden md:flex items-center gap-2">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="px-3.5 py-2 text-[13.5px] text-slate-600 hover:text-brand-700">
+                        <a href="{{ route('home') }}" class="px-3.5 py-2 text-[13.5px] text-slate-600 hover:text-brand-700">
                             {{ Auth::user()->name }}
                         </a>
                         <form method="POST" action="{{ route('logout') }}">
@@ -152,7 +152,11 @@
                 <a href="#contact" class="block" @click="mobileOpen=false">Contact</a>
                 <div class="pt-2 flex gap-2">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="flex-1 text-center py-2 rounded-lg border border-slate-200">Dashboard</a>
+                        <a href="{{ route('home') }}" class="flex-1 text-center py-2 rounded-lg border border-slate-200 text-slate-700">{{ Auth::user()->name }}</a>
+                        <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                            @csrf
+                            <button type="submit" class="w-full py-2 rounded-lg border border-slate-200 text-slate-600">Logout</button>
+                        </form>
                     @else
                         <a href="{{ route('login') }}" class="flex-1 text-center py-2 rounded-lg border border-slate-200">Login</a>
                         <a href="{{ route('register') }}" class="flex-1 text-center py-2 rounded-lg bg-brand-700 text-white font-medium">Sign up</a>

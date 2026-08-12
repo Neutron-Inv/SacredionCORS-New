@@ -42,6 +42,12 @@ return [
         'password' => env('CORS_FTP_PASSWORD', 'Nigeria'),
         'passive' => env('CORS_FTP_PASSIVE', true),
         'root' => env('CORS_FTP_ROOT', '/RINEX_1_2'),
+        'retention_months' => (int) env('CORS_RETENTION_MONTHS', 3),
+        'sync_days' => (int) env('CORS_SYNC_DAYS', 2),
+    ],
+
+    'sogpos' => [
+        'google_play_url' => env('SOGPOS_GOOGLE_PLAY_URL'),
     ],
 
 ];

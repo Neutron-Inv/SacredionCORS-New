@@ -49,7 +49,9 @@ return [
 
         'cors' => [
             'driver' => 'local',
-            'root' => storage_path('app/cors'),
+            'root' => storage_path('app/public/cors'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/cors',
+            'visibility' => 'public',
             'throw' => false,
             'report' => false,
         ],
