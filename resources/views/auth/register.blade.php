@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-6">
         <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Create account</h2>
-        <p class="text-sm text-slate-500 mt-1">Join Sacredion CORS with your basic profile details.</p>
+        <p class="text-sm text-slate-500 mt-1">Join Sacredion CORS with your basic profile details. We'll send a verification link to your email.</p>
     </div>
 
     <form method="POST" action="{{ route('register') }}">
@@ -61,6 +61,8 @@
             </select>
             <x-input-error :messages="$errors->get('country')" class="mt-2" />
         </div>
+
+        <x-recaptcha />
 
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-slate-600 hover:text-brand-700 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2" href="{{ route('login') }}">

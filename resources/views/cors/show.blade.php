@@ -116,6 +116,14 @@
                         </div>
                     @endguest
 
+                    @auth
+                        @unless (Auth::user()->hasVerifiedEmail())
+                            <div class="px-5 py-3 bg-amber-50 border-b border-amber-100 text-sm text-amber-800">
+                                Please <a href="{{ route('verification.notice') }}" class="font-medium underline">verify your email</a> before downloading GNSS files.
+                            </div>
+                        @endunless
+                    @endauth
+
                     @if ($files->isEmpty())
                         <div class="p-12 text-center">
                             <p class="text-slate-600 font-medium">No GNSS files indexed yet</p>
