@@ -450,9 +450,9 @@
                 scrollWheelZoom: false
             }).setView([7.5, 6.5], 6);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap &copy; CARTO',
-                maxZoom: 18
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19
             }).addTo(map);
 
             const icon = L.divIcon({
