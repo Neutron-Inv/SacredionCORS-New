@@ -36,7 +36,7 @@
 
             <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-200 rounded-xl overflow-hidden border border-slate-200 shadow-soft"
                 data-aos="fade-up">
-                @foreach ([[$states->count(), 'CORS stations'], ['24/7', 'Live coverage'], ['cm-level', 'Accuracy'], ['NTRIP', 'RTK ready']] as $stat)
+                @foreach ([[$states->count(), 'CORS stations'], ['24/7', 'Live coverage'], ['cm-level', 'Accuracy'], ['RINEX GNSS Data Download', 'Static GNSS Sessions']] as $stat)
                     <div class="bg-white/90 backdrop-blur-sm px-5 py-6 text-center">
                         <div class="text-xl font-semibold text-slate-900">{{ $stat[0] }}</div>
                         <div class="text-xs text-slate-500 mt-1">{{ $stat[1] }}</div>
@@ -396,31 +396,44 @@
 
     {{-- ABOUT --}}
     <section id="about" class="py-8 pb-20">
-        <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-10 items-center">
-            <div class="rounded-2xl overflow-hidden border border-slate-200 h-[380px]" data-aos="fade-up">
+        <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-10 items-start">
+            <div class="rounded-2xl overflow-hidden border border-slate-200 h-[380px] lg:sticky lg:top-28"
+                data-aos="fade-up">
                 <img src="{{ asset('images/why-us.jpg') }}" alt="Sacredion geospatial infrastructure"
                     class="w-full h-full object-cover">
             </div>
 
-            <div data-aos="fade-up" data-aos-delay="60">
-                <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">What is SOGPOS?</h2>
-                <p class="mt-3 text-slate-500 leading-relaxed">
-                    Developed in collaboration with industry and academic partners across Nigeria.
+            <div data-aos="fade-up" data-aos-delay="60" class="space-y-4 text-slate-600 leading-relaxed">
+                <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">What is SOGPOS?</h2>
+                <p>
+                    <strong class="font-medium text-slate-900">SOGPOS — Sacredion Online GNSS Positioning Service</strong>
+                    is a nationwide GNSS positioning infrastructure developed by Sacredion Nigeria Limited in collaboration
+                    with Tersus GNSS Inc. to provide surveyors, engineers, researchers, and geospatial professionals with
+                    reliable and convenient access to high precision GNSS correction services and observation data.
                 </p>
-                <ul class="mt-6 space-y-2.5 text-sm text-slate-600">
-                    @foreach ($partners as $partner)
-                        <li class="flex gap-2.5">
-                            <span class="mt-2 w-1 h-1 rounded-full bg-brand-600 shrink-0"></span>
-                            <span>{{ $partner }}</span>
-                        </li>
-                    @endforeach
-                </ul>
-                <div class="mt-7 rounded-xl border border-slate-200 bg-white p-5">
-                    <h3 class="font-medium text-slate-900">More about us</h3>
-                    <p class="mt-1.5 text-sm text-slate-500 leading-relaxed">
-                        A cross-disciplinary team offering Geospatial, Engineering and IT infrastructure services.
-                    </p>
-                </div>
+                <p>
+                    SOGPOS provides real time RTK correction services via NTRIP, enabling centimetre level positioning for
+                    surveying and engineering applications. It also provides access to static GNSS observation data in RINEX
+                    format for post processing, geodetic research, control establishment, and other precision positioning
+                    applications.
+                </p>
+                <p>
+                    At the heart of SOGPOS is a growing network of Continuously Operating Reference Stations (CORS)
+                    strategically distributed across Nigeria. The platform is designed around a simple objective:
+                </p>
+                <p class="font-medium text-slate-900 border-l-2 border-brand-700 pl-4">
+                    Make high precision GNSS positioning and data readily accessible, without geographical limitations.
+                </p>
+                <p>
+                    Rather than operating as an isolated CORS network, SOGPOS is being developed through collaboration
+                    between industry, academia, professional institutions, and private surveying practitioners, creating a
+                    shared positioning infrastructure that supports the wider Nigerian geospatial community.
+                </p>
+                <p>
+                    SOGPOS represents more than access to correction data. It is an expanding GNSS positioning ecosystem
+                    designed to give surveyors and engineers limitless possibilities for precise positioning anywhere within
+                    its network coverage.
+                </p>
             </div>
         </div>
     </section>
