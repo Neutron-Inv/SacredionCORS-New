@@ -106,10 +106,10 @@
 
             <nav class="hidden md:flex items-center gap-7 text-[13.5px] text-slate-600">
                 <a href="{{ route('home') }}" class="hover:text-brand-700 transition">Home</a>
-                <a href="#cors" class="hover:text-brand-700 transition">CORS</a>
-                <a href="#pricing" class="hover:text-brand-700 transition">Pricing</a>
-                <a href="#about" class="hover:text-brand-700 transition">About</a>
-                <a href="#contact" class="hover:text-brand-700 transition">Contact</a>
+                <a href="{{ route('home') }}#cors" class="hover:text-brand-700 transition">CORS</a>
+                <a href="{{ route('home') }}#pricing" class="hover:text-brand-700 transition">Pricing</a>
+                <a href="{{ route('home') }}#about" class="hover:text-brand-700 transition">About</a>
+                <a href="{{ route('home') }}#contact" class="hover:text-brand-700 transition">Contact</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -146,10 +146,10 @@
         <div x-show="mobileOpen" x-cloak x-transition class="md:hidden border-t border-slate-100 bg-white">
             <div class="px-5 py-4 space-y-3 text-sm text-slate-700">
                 <a href="{{ route('home') }}" class="block" @click="mobileOpen=false">Home</a>
-                <a href="#cors" class="block" @click="mobileOpen=false">CORS</a>
-                <a href="#pricing" class="block" @click="mobileOpen=false">Pricing</a>
-                <a href="#about" class="block" @click="mobileOpen=false">About</a>
-                <a href="#contact" class="block" @click="mobileOpen=false">Contact</a>
+                <a href="{{ route('home') }}#cors" class="block" @click="mobileOpen=false">CORS</a>
+                <a href="{{ route('home') }}#pricing" class="block" @click="mobileOpen=false">Pricing</a>
+                <a href="{{ route('home') }}#about" class="block" @click="mobileOpen=false">About</a>
+                <a href="{{ route('home') }}#contact" class="block" @click="mobileOpen=false">Contact</a>
                 <div class="pt-2 flex gap-2">
                     @auth
                         <a href="{{ route('home') }}" class="flex-1 text-center py-2 rounded-lg border border-slate-200 text-slate-700">{{ Auth::user()->name }}</a>
@@ -191,9 +191,9 @@
                 <h4 class="font-semibold text-slate-900 mb-3">Links</h4>
                 <ul class="space-y-2 text-slate-500">
                     <li><a href="{{ route('home') }}" class="hover:text-brand-700">Home</a></li>
-                    <li><a href="#about" class="hover:text-brand-700">About</a></li>
-                    <li><a href="#cors" class="hover:text-brand-700">CORS network</a></li>
-                    <li><a href="#pricing" class="hover:text-brand-700">Pricing</a></li>
+                    <li><a href="{{ route('home') }}#about" class="hover:text-brand-700">About</a></li>
+                    <li><a href="{{ route('home') }}#cors" class="hover:text-brand-700">CORS network</a></li>
+                    <li><a href="{{ route('privacy') }}" class="hover:text-brand-700">Privacy Policy</a></li>
                 </ul>
             </div>
             <div>
@@ -225,9 +225,12 @@
         </div>
 
         <div class="border-t border-slate-200">
-            <div class="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row gap-1 justify-between text-xs text-slate-400">
+            <div class="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between text-xs text-slate-400">
                 <p>© {{ date('Y') }} Sacredion Nigeria Limited</p>
-                <p>Developed by <a href="https://virtualhorizons.com.ng" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-brand-700">Virtual Horizons</a></p>
+                <div class="flex flex-wrap gap-x-4 gap-y-1">
+                    <a href="{{ route('privacy') }}" class="text-slate-600 hover:text-brand-700">Privacy Policy</a>
+                    <p>Developed by <a href="https://virtualhorizons.com.ng" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-brand-700">Virtual Horizons</a></p>
+                </div>
             </div>
         </div>
     </footer>
