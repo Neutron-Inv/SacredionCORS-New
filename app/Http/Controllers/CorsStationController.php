@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\CorsFile;
 use App\Models\CorsStation;
+use App\Services\CorsDailyCatalog;
+use App\Services\CorsDailyOrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -11,7 +13,7 @@ use ZipArchive;
 
 class CorsStationController extends Controller
 {
-    public function show(Request $request, CorsStation $station)
+    public function show(Request $request, CorsStation $station, CorsDailyCatalog $catalog, CorsDailyOrderService $orders)
     {
         abort_unless($station->is_active, 404);
 
@@ -43,7 +45,18 @@ class CorsStationController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        return view('cors.show', compact('station', 'files', 'years', 'days'));
+        $dailyOrder = [
+            'dates' => $catalog->dateOptions($station),
+            'previewUrl' => route('cors.daily.preview', $station),
+            'storeUrl' => route('cors.daily.store', $station),
+            'priceLabel' => $orders->priceLabel(),
+            'mode' => $orders->paymentMode(),
+            'downloadDays' => (int) config('cors.daily.download_days', 7),
+            'canOrder' => (bool) $request->user()?->hasVerifiedEmail(),
+            'authenticated' => $request->user() !== null,
+        ];
+
+        return view('cors.show', compact('station', 'files', 'years', 'days', 'dailyOrder'));
     }
 
     public function download(CorsFile $file): StreamedResponse

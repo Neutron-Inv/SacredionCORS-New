@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CorsDailyOrderController;
 use App\Http\Controllers\CorsStationController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\HomeController;
@@ -13,6 +14,17 @@ Route::get('/privacy', PrivacyController::class)->name('privacy');
 Route::get('/deploy/refresh/{token}', [DeployController::class, 'refresh'])->name('deploy.refresh');
 
 Route::get('/cors/{station:slug}', [CorsStationController::class, 'show'])->name('cors.show');
+Route::get('/cors/{station:slug}/24h', [CorsDailyOrderController::class, 'preview'])->name('cors.daily.preview');
+Route::post('/cors/{station:slug}/24h', [CorsDailyOrderController::class, 'store'])
+    ->middleware(['auth', 'verified', 'throttle:10,1'])
+    ->name('cors.daily.store');
+Route::post('/cors/24h-orders/{order}/confirm', [CorsDailyOrderController::class, 'confirm'])
+    ->middleware(['auth', 'verified', 'throttle:20,1'])
+    ->name('cors.daily.confirm');
+Route::post('/webhooks/paystack', [CorsDailyOrderController::class, 'webhook'])->name('webhooks.paystack');
+Route::get('/downloads/cors-24h/{token}', [CorsDailyOrderController::class, 'download'])
+    ->middleware('throttle:30,1')
+    ->name('cors.daily.download');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -29,4 +41,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

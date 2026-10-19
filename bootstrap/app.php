@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         RedirectIfAuthenticated::redirectUsing(fn () => route('home'));
+
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/paystack',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

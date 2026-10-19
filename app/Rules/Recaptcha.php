@@ -12,7 +12,7 @@ class Recaptcha implements ValidationRule
     {
         $secret = config('services.recaptcha.secret_key');
 
-        if (! $secret || app()->environment('testing')) {
+        if (! config('services.recaptcha.enabled') || ! $secret || app()->environment('testing')) {
             return;
         }
 

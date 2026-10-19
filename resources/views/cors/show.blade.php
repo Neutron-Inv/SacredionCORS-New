@@ -187,8 +187,9 @@
                 </div>
             </div>
 
-            {{-- LOCATION --}}
             <div class="space-y-5">
+                @include('cors.partials.daily-order')
+
                 <div class="rounded-2xl border border-slate-200 bg-white p-5">
                     <h3 class="font-semibold">Station location</h3>
                     <p class="mt-2 text-sm text-slate-500 leading-relaxed">{{ $station->location }}</p>

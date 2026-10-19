@@ -57,6 +57,13 @@ return [
     'recaptcha' => [
         'site_key' => env('RECAPTCHA_SITE_KEY'),
         'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+        'enabled' => env('APP_ENV') !== 'local',
+    ],
+
+    'paystack' => [
+        'public_key' => env('PAYSTACK_PUBLIC_KEY'),
+        'secret_key' => env('PAYSTACK_SECRET_KEY'),
+        'url' => rtrim(env('PAYSTACK_PAYMENT_URL', 'https://api.paystack.co'), '/'),
     ],
 
 ];

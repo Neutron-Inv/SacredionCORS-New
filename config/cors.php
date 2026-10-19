@@ -37,4 +37,29 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | 24-hour merged RINEX orders
+    |--------------------------------------------------------------------------
+    |
+    | Price is in major currency units (5000 NGN = ₦5,000). Paystack is charged
+    | in minor units. Today is decided in this timezone so a day still being
+    | recorded cannot be ordered. Download links are deleted after download_days.
+    |
+    */
+
+    'daily' => [
+        'price' => (float) env('CORS_24H_PRICE', 5000),
+        'currency' => env('CORS_24H_CURRENCY', 'NGN'),
+        'download_days' => (int) env('CORS_24H_DOWNLOAD_DAYS', 7),
+        'timezone' => env('CORS_24H_TIMEZONE', 'Africa/Lagos'),
+        // Keep one observation epoch every N seconds. 0 or 1 leaves the recorded interval unchanged.
+        'interval' => max(0, (int) env('CORS_24H_INTERVAL', 30)),
+        // Matched as a suffix of the file extension. "o" shortens .26o and leaves .26n, .26g, and the rest intact.
+        'shorten_extensions' => array_values(array_filter(array_map(
+            static fn (string $extension): string => strtolower(ltrim(trim($extension), '.')),
+            explode(',', (string) env('CORS_24H_SHORTEN_EXTENSIONS', 'o')),
+        ))),
+    ],
+
 ];

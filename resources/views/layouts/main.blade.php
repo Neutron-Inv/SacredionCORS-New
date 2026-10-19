@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SOGPOS – Sacredion GNSS')</title>
     <meta name="description" content="Sacredion Online GNSS Positioning Service (SOGPOS) — high-precision CORS data across Nigeria.">
     <meta name="keywords" content="geospatial, GNSS, CORS, Sacredion, mapping, SOGPOS">

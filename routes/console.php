@@ -25,3 +25,5 @@ foreach ($corsSchedule['sync_stations'] ?? [] as $slug => $cron) {
 if ($cron = $corsSchedule['index'] ?? null) {
     Schedule::command('cors:index')->cron($cron);
 }
+
+Schedule::command('cors:purge-daily-orders')->dailyAt('02:20');
