@@ -28,7 +28,7 @@ class CorsDailyOrderReady extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.cors-daily.ready',
+            view: 'mail.cors-daily.ready',
         );
     }
 }

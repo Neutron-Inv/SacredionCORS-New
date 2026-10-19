@@ -90,7 +90,12 @@ it('merges the day after payment and deletes the archive when the link expires',
 
     Mail::assertSent(CorsDailyOrderPreparing::class);
     Mail::assertSent(CorsDailyOrderReady::class, function (CorsDailyOrderReady $mail) use ($order) {
-        return str_contains($mail->render(), $order->download_url);
+        $html = $mail->render();
+
+        return str_contains($html, $order->download_url)
+            && str_contains($html, 'Sacredion')
+            && str_contains($html, '#050094')
+            && str_contains($html, 'Download 24-hour file');
     });
 
     $this->get(route('cors.daily.download', $order->download_token))

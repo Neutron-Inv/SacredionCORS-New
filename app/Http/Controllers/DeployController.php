@@ -22,6 +22,14 @@ class DeployController extends Controller
         $results['optimize:clear'] = trim(Artisan::output()) ?: 'Done.';
 
         try {
+            $exit = Artisan::call('migrate', ['--force' => true]);
+            $output = trim(Artisan::output()) ?: 'Done.';
+            $results['migrate'] = $exit === 0 ? $output : 'Failed: '.$output;
+        } catch (\Throwable $e) {
+            $results['migrate'] = 'Failed: '.$e->getMessage();
+        }
+
+        try {
             Artisan::call('storage:link', ['--force' => true]);
             $results['storage:link'] = trim(Artisan::output()) ?: 'Done.';
         } catch (\Throwable $e) {
