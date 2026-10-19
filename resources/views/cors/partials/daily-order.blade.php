@@ -9,16 +9,36 @@
         <p class="mt-4 text-sm text-slate-600">No completed day is available for {{ $station->name }} yet.</p>
     @else
         <p class="mt-4 text-xs text-slate-400">
-            Earliest day: {{ $dailyOrder['dates'][0]['label'] }}
+            Earliest day: {{ $dailyOrder['dates'][0]['label'] }}. Days without files cannot be selected.
         </p>
 
-        <label for="daily-date" class="mt-3 block text-xs font-medium text-slate-500">Date</label>
-        <select id="daily-date" x-model="date" @change="fetchCount()"
-            class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
-            @foreach ($dailyOrder['dates'] as $option)
-                <option value="{{ $option['value'] }}" @selected($loop->last)>{{ $option['label'] }}</option>
-            @endforeach
-        </select>
+        <div class="mt-3 rounded-xl border border-slate-200 p-3">
+            <div class="flex items-center justify-between">
+                <button type="button" @click="previousMonth()" :disabled="!canGoPrevious" aria-label="Previous month"
+                    class="h-8 w-8 rounded-lg text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent">‹</button>
+                <p class="text-sm font-medium text-slate-900" x-text="monthLabel"></p>
+                <button type="button" @click="nextMonth()" :disabled="!canGoNext" aria-label="Next month"
+                    class="h-8 w-8 rounded-lg text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent">›</button>
+            </div>
+            <div class="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] font-medium text-slate-400">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div class="mt-1 grid grid-cols-7 gap-1">
+                <template x-for="cell in calendarCells" :key="cell.key">
+                    <div class="h-8">
+                        <button type="button"
+                            x-show="cell.day"
+                            class="h-8 w-full rounded-lg text-sm"
+                            :class="cellClass(cell)"
+                            :disabled="!cell.enabled"
+                            :aria-pressed="cell.value === date"
+                            :aria-label="cell.value || ''"
+                            @click="selectDate(cell.value)"
+                            x-text="cell.day"></button>
+                    </div>
+                </template>
+            </div>
+        </div>
 
         <div class="mt-3 text-sm text-slate-600" x-cloak>
             <template x-if="loading">
@@ -28,7 +48,7 @@
                 <p>
                     <span class="font-semibold text-slate-900" x-text="count"></span>
                     files found for this day.
-                    <span class="block text-xs text-slate-400 mt-1" x-show="extensionLabel" x-text="extensionLabel"></span>
+                    {{-- <span class="block text-xs text-slate-400 mt-1" x-show="extensionLabel" x-text="extensionLabel"></span> --}}
                 </p>
             </template>
             <p class="text-red-600" x-show="error" x-text="error"></p>
@@ -108,7 +128,10 @@
         function dailyOrder(config) {
             return {
                 dates: config.dates,
+                available: Object.fromEntries(config.dates.map((option) => [option.value, true])),
                 date: config.dates.length ? config.dates[config.dates.length - 1].value : '',
+                visibleYear: null,
+                visibleMonth: null,
                 count: null,
                 extensionLabel: '',
                 loading: false,
@@ -118,9 +141,98 @@
                 message: '',
                 downloadUrl: null,
                 init() {
-                    if (this.date) {
-                        this.fetchCount();
+                    if (!this.date) {
+                        return;
                     }
+                    const [year, month] = this.date.split('-').map(Number);
+                    this.visibleYear = year;
+                    this.visibleMonth = month - 1;
+                    this.fetchCount();
+                },
+                get monthLabel() {
+                    if (this.visibleYear === null) {
+                        return '';
+                    }
+                    return new Date(this.visibleYear, this.visibleMonth, 1).toLocaleDateString('en-US', {
+                        month: 'long',
+                        year: 'numeric',
+                    });
+                },
+                get canGoPrevious() {
+                    return this.monthOffset(this.dates[0]?.value) < this.monthIndex();
+                },
+                get canGoNext() {
+                    const last = this.dates[this.dates.length - 1]?.value;
+                    return this.monthOffset(last) > this.monthIndex();
+                },
+                get calendarCells() {
+                    if (this.visibleYear === null) {
+                        return [];
+                    }
+                    const firstWeekday = new Date(this.visibleYear, this.visibleMonth, 1).getDay();
+                    const days = new Date(this.visibleYear, this.visibleMonth + 1, 0).getDate();
+                    const cells = [];
+                    for (let index = 0; index < firstWeekday; index++) {
+                        cells.push({ key: `blank-${index}`, day: null, value: null, enabled: false });
+                    }
+                    for (let day = 1; day <= days; day++) {
+                        const value = `${this.visibleYear}-${String(this.visibleMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        cells.push({
+                            key: value,
+                            day,
+                            value,
+                            enabled: Boolean(this.available[value]),
+                        });
+                    }
+                    return cells;
+                },
+                monthIndex() {
+                    return this.visibleYear * 12 + this.visibleMonth;
+                },
+                monthOffset(value) {
+                    if (!value) {
+                        return this.monthIndex();
+                    }
+                    const [year, month] = value.split('-').map(Number);
+                    return year * 12 + (month - 1);
+                },
+                previousMonth() {
+                    if (!this.canGoPrevious) {
+                        return;
+                    }
+                    if (this.visibleMonth === 0) {
+                        this.visibleMonth = 11;
+                        this.visibleYear -= 1;
+                        return;
+                    }
+                    this.visibleMonth -= 1;
+                },
+                nextMonth() {
+                    if (!this.canGoNext) {
+                        return;
+                    }
+                    if (this.visibleMonth === 11) {
+                        this.visibleMonth = 0;
+                        this.visibleYear += 1;
+                        return;
+                    }
+                    this.visibleMonth += 1;
+                },
+                selectDate(value) {
+                    if (!value || !this.available[value]) {
+                        return;
+                    }
+                    this.date = value;
+                    this.fetchCount();
+                },
+                cellClass(cell) {
+                    if (!cell.day || !cell.enabled) {
+                        return 'text-slate-300 cursor-not-allowed';
+                    }
+                    if (cell.value === this.date) {
+                        return 'bg-brand-700 text-white font-medium';
+                    }
+                    return 'text-slate-800 hover:bg-brand-50';
                 },
                 get selectedLabel() {
                     const match = this.dates.find((option) => option.value === this.date);

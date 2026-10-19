@@ -35,8 +35,8 @@ it('offers completed days and rejects today', function () {
         ->get(route('cors.show', $station))
         ->assertOk()
         ->assertSee('24-hour data')
-        ->assertSee('value="2026-10-15"', false)
-        ->assertDontSee('value="2026-10-16"', false);
+        ->assertSee('2026-10-15', false)
+        ->assertDontSee('2026-10-16', false);
 
     $this->getJson(route('cors.daily.preview', $station).'?date=2026-10-15')
         ->assertOk()
