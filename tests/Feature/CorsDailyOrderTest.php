@@ -7,6 +7,7 @@ use App\Models\CorsFile;
 use App\Models\CorsStation;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -126,6 +127,99 @@ it('does not mark an order paid when the amount does not match', function () {
 
     expect($order->refresh()->paid_at)->toBeNull();
     Mail::assertNothingSent();
+});
+
+it('confirms a pending paystack charge from the scheduler', function () {
+    [$user, $station] = stationWithDailyFiles();
+    fakePaystack(500000);
+
+    $this->actingAs($user)
+        ->postJson(route('cors.daily.store', $station), ['date' => '2026-10-15'])
+        ->assertOk();
+
+    $order = CorsDailyOrder::first();
+    expect($order->status)->toBe(CorsDailyOrder::PENDING);
+
+    $this->artisan('cors:reconcile-daily-payments')->assertSuccessful();
+
+    expect($order->refresh()->status)->toBe(CorsDailyOrder::READY);
+    Mail::assertSent(CorsDailyOrderPreparing::class);
+});
+
+it('leaves a pending order alone when paystack has not charged it', function () {
+    [$user, $station] = stationWithDailyFiles();
+    fakePaystack(100);
+
+    $this->actingAs($user)
+        ->postJson(route('cors.daily.store', $station), ['date' => '2026-10-15'])
+        ->assertOk();
+
+    $order = CorsDailyOrder::first();
+
+    $this->artisan('cors:reconcile-daily-payments')->assertSuccessful();
+
+    expect($order->refresh()->paid_at)->toBeNull()
+        ->and($order->status)->toBe(CorsDailyOrder::PENDING);
+    Mail::assertNothingSent();
+});
+
+it('does not verify pending orders older than a day', function () {
+    [$user, $station] = stationWithDailyFiles();
+    fakePaystack(500000);
+
+    $this->actingAs($user)
+        ->postJson(route('cors.daily.store', $station), ['date' => '2026-10-15'])
+        ->assertOk();
+
+    $order = CorsDailyOrder::first();
+    $order->forceFill(['created_at' => now()->subHours(25)])->save();
+
+    Http::fake([
+        'https://api.paystack.co/*' => Http::response(['status' => true], 500),
+    ]);
+
+    $this->artisan('cors:reconcile-daily-payments')->assertSuccessful();
+
+    expect($order->refresh()->paid_at)->toBeNull();
+    Http::assertNothingSent();
+});
+
+it('keeps checking when paystack verify fails', function () {
+    [$user, $station] = stationWithDailyFiles();
+    Http::preventStrayRequests();
+    Http::fake([
+        'https://api.paystack.co/transaction/initialize' => Http::response([
+            'status' => true,
+            'data' => [
+                'authorization_url' => 'https://checkout.paystack.com/abc',
+                'access_code' => 'access-code',
+                'reference' => 'ref',
+            ],
+        ]),
+        'https://api.paystack.co/transaction/verify/*' => Http::response([
+            'status' => false,
+            'message' => 'Transaction reference not found',
+        ], 404),
+    ]);
+
+    $this->actingAs($user)
+        ->postJson(route('cors.daily.store', $station), ['date' => '2026-10-15'])
+        ->assertOk();
+
+    $order = CorsDailyOrder::first();
+
+    $this->artisan('cors:reconcile-daily-payments')->assertSuccessful();
+
+    expect($order->refresh()->paid_at)->toBeNull();
+});
+
+it('schedules the paystack check every minute', function () {
+    $event = collect(app(Schedule::class)->events())
+        ->first(fn ($event) => str_contains((string) $event->command, 'cors:reconcile-daily-payments'));
+
+    expect($event)->not->toBeNull()
+        ->and($event->expression)->toBe('* * * * *')
+        ->and($event->withoutOverlapping)->toBeTrue();
 });
 
 it('accepts a signed paystack webhook for the stored reference', function () {

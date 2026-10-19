@@ -27,3 +27,7 @@ if ($cron = $corsSchedule['index'] ?? null) {
 }
 
 Schedule::command('cors:purge-daily-orders')->dailyAt('02:20');
+
+Schedule::command('cors:reconcile-daily-payments')
+    ->everyMinute()
+    ->withoutOverlapping();
